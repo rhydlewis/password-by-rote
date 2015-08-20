@@ -1,5 +1,7 @@
 import getpass
+
 from Crypto.Hash import SHA256
+from colorama import init, deinit, Fore
 
 
 def load_password_hash():
@@ -14,22 +16,32 @@ def check_password(clear_password, password_hash):
     return hashed_result == password_hash
 
 
-def main(password):
+def main(expected):
     finished = False
-    passed = 0
-    failed = 0
+    success = 0
+    fail = 0
     while not finished:
-        line = getpass.getpass()
-        if check_password(line, password):
-            passed += 1
-        elif line == 'q':
-            pct = (passed/passed + failed) * 100
-            print("Success vs. fail {0}/{1} ({2}% success)".format(passed, failed, (pct)))
+        actual = getpass.getpass()
+
+        if check_password(actual, expected):
+            success += 1
+            display_result(Fore.GREEN, "Correct", success, fail)
+        elif actual == 'q':
             finished = True
+            print(Fore.RESET + "Quit")
         else:
-            failed += 1
+            fail += 1
+            display_result(Fore.RED, "Incorrect", success, fail)
+        print(Fore.WHITE + '')
+
+
+def display_result(color, msg, success, fail):
+    pct = round((float(success) / float(success + fail)) * 100.0, 1)
+    print(color + "{0}: {1}/{2} ({3}% success)".format(msg, success, fail, pct))
 
 
 if __name__ == '__main__':
+    init()
     hashed_password = load_password_hash()
     main(hashed_password)
+    deinit()
