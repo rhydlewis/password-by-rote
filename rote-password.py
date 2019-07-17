@@ -8,7 +8,7 @@ def load_password_hash():
     f = open('password-hash.txt', 'r')
     line = f.readline()
     f.close()
-    return line
+    return line.strip()
 
 
 def check_password(clear_password, password_hash):
